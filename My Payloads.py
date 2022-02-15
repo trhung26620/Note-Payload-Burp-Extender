@@ -321,7 +321,7 @@ class BurpExtender(IBurpExtender, ITab):
         # self.configPanel.setPreferredSize(Dimension(600, 1040))
         leftPanel = JPanel()
         leftPanel.setBorder(CompoundBorder(TitledBorder("Payload Type Configuration"), EmptyBorder(4, 4, 4, 4)))
-        leftPanel.setPreferredSize(Dimension(500, 940))
+        leftPanel.setPreferredSize(Dimension(500, 1290))
         addTypePanel =  JPanel(GridBagLayout())
         addTypePanel.setPreferredSize(Dimension(480, 150))
         gbc.insets = Insets(0,0,0,0)
@@ -375,7 +375,7 @@ class BurpExtender(IBurpExtender, ITab):
            
         self.rightPanel = JPanel()
         self.rightPanel.setBorder(CompoundBorder(TitledBorder("Edit Payloads"), EmptyBorder(4, 4, 4, 4)))          
-        self.rightPanel.setPreferredSize(Dimension(1200, 940))
+        self.rightPanel.setPreferredSize(Dimension(1200, 1290))
 
         self.selectTypePanel = JPanel(GridBagLayout())
         self.selectTypePanel.setPreferredSize(Dimension(1000, 50))
