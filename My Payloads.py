@@ -1,6 +1,6 @@
 from burp import IBurpExtender, ITab
 from javax.swing import JPanel, JScrollPane, JTextPane, JButton, JTextArea, JOptionPane, JLabel, JComboBox,JTextField, BorderFactory, JTabbedPane, JRadioButton
-from java.awt import GridBagLayout, Color, Dimension, FlowLayout, GridBagConstraints, Font, Insets
+from java.awt import BorderLayout,GridBagLayout, Color, Dimension, FlowLayout, GridBagConstraints, Font, Insets
 from javax.swing.border import EmptyBorder, CompoundBorder, TitledBorder
 
 class fileUtil:
@@ -316,13 +316,12 @@ class BurpExtender(IBurpExtender, ITab):
         gbc = GridBagConstraints()
         containerPanel = JTabbedPane()
         ##################################
-        self.configPanel = JPanel(FlowLayout())
+        self.configPanel = JPanel(GridBagLayout())
         self.configPanel.setName("Configuration")
-        
+        # self.configPanel.setPreferredSize(Dimension(600, 1040))
         leftPanel = JPanel()
         leftPanel.setBorder(CompoundBorder(TitledBorder("Payload Type Configuration"), EmptyBorder(4, 4, 4, 4)))
-        leftPanel.setPreferredSize(Dimension(500, 1300))
-        
+        leftPanel.setPreferredSize(Dimension(500, 940))
         addTypePanel =  JPanel(GridBagLayout())
         addTypePanel.setPreferredSize(Dimension(480, 150))
         gbc.insets = Insets(0,0,0,0)
@@ -363,13 +362,20 @@ class BurpExtender(IBurpExtender, ITab):
         
         self.dsplayPanel = JPanel(GridBagLayout())
         self.dsplayPanel.setPreferredSize(Dimension(480, 1000))
-        self.loadPayloadType()
         
+        
+        # panelScroll = JScrollPane(self.dsplayPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED)
+        # panelScroll.setViewportView()
+        # panelScroll.setPreferredSize(Dimension(480, 600))
         leftPanel.add(self.dsplayPanel)
+        leftPanel.setVisible(True)
+        
+        self.loadPayloadType()
+        # leftPanel.add(self.dsplayPanel)
            
         self.rightPanel = JPanel()
         self.rightPanel.setBorder(CompoundBorder(TitledBorder("Edit Payloads"), EmptyBorder(4, 4, 4, 4)))          
-        self.rightPanel.setPreferredSize(Dimension(1200, 1300))
+        self.rightPanel.setPreferredSize(Dimension(1200, 940))
 
         self.selectTypePanel = JPanel(GridBagLayout())
         self.selectTypePanel.setPreferredSize(Dimension(1000, 50))
@@ -415,30 +421,37 @@ class BurpExtender(IBurpExtender, ITab):
         editPayloadPanel.add(jsp,gbc)
         self.rightPanel.add(editPayloadPanel)
         
-        self.configPanel.add(leftPanel)
-        self.configPanel.add(self.rightPanel)
+        # self.dsplayPanel.setPreferredSize(Dimension(480, 1000))
+
+        gbc.gridx = 0
+        gbc.gridy = 0
+        gbc.insets = Insets(-350,0,0,0)
+        self.configPanel.add(leftPanel,gbc)
+        gbc.gridx = 1
+        gbc.insets = Insets(-350,0,0,0)
+        self.configPanel.add(self.rightPanel,gbc)
         
-        payloadPanel = JPanel(GridBagLayout())
+        payloadPanel = JPanel(BorderLayout())
         showPanel = JPanel(GridBagLayout())
-        showPanel.setPreferredSize(Dimension(1000, 1100))
+        showPanel.setPreferredSize(Dimension(1000, 950))
         # blackBorder = BorderFactory.createLineBorder(Color.black)
         # showPanel.setBorder(blackBorder)
         self.showTextPane = JTextPane()
         self.showTextPane.setEditable(False)
         showJsp = JScrollPane(self.showTextPane) 
-        showJsp.setPreferredSize(Dimension(900, 1000))
+        showJsp.setPreferredSize(Dimension(1100, 900))
         self.showTextPane.setContentType("text/html")
         self.displayPayloads()
         showLabel = JLabel("Your Payloads")
         showLabel.setFont(Font(showLabel.getFont().getName(), Font.BOLD, 15))
         gbc.gridx = 0
         gbc.gridy = 0
-        gbc.insets = Insets(-40,0,0,785)        
+        gbc.insets = Insets(0,0,0,985)        
         showPanel.add(showLabel, gbc)
         gbc.gridy = 1
-        gbc.insets = Insets(0,0,0,0) 
+        gbc.insets = Insets(10,0,0,0) 
         showPanel.add(showJsp, gbc)              
-        payloadPanel.add(showPanel)
+        payloadPanel.add(showPanel, BorderLayout.NORTH)
         
         containerPanel.add(self.configPanel)
         containerPanel.add(payloadPanel)
