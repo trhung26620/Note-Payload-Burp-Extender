@@ -1,7 +1,9 @@
 from burp import IBurpExtender, ITab
-from javax.swing import JPanel, JScrollPane, JTextPane, JButton, JTextArea, JOptionPane, JLabel, JComboBox,JTextField, BorderFactory, JTabbedPane, JRadioButton
+from javax.swing import JPanel, JFrame,JScrollPane, JTextPane, JButton, JTextArea, JOptionPane, JLabel, JComboBox,JTextField, BorderFactory, JTabbedPane, JRadioButton
 from java.awt import BorderLayout,GridBagLayout, Color, Dimension, FlowLayout, GridBagConstraints, Font, Insets
 from javax.swing.border import EmptyBorder, CompoundBorder, TitledBorder
+from javax.swing.text import DefaultHighlighter, Document, Highlighter
+import java
 
 class fileUtil:
     def __init__(self, dataFpath):
@@ -245,6 +247,9 @@ class BurpExtender(IBurpExtender, ITab):
         self.displayPayloads()
     
     def deleteType(self, event):
+        confirm = JOptionPane.showConfirmDialog(self.configPanel, "Are you sure to delete the selected selections?", "Confirm", JOptionPane.OK_CANCEL_OPTION)
+        if confirm == 2 :
+            return
         self.futil.delFileLine("* Selected Options:")
         self.futil.delFileLine("*"*200)
         for x in self.radioBtnList:
@@ -304,7 +309,36 @@ class BurpExtender(IBurpExtender, ITab):
             self.dsplayPanel.repaint()
             self.displayPayloads()
             self.typeCb.setSelectedItem(newName)
-
+        
+    #Search functions    
+    def search(self, event):
+        data = event.getSource().getText()
+        hiliter = self.showTextPane.getHighlighter()
+        hiliter.removeAllHighlights()
+        if data:
+            doc = self.showTextPane.getDocument()
+            text = doc.getText(0, doc.getLength())
+            start = 0
+            here = text.upper().find(data.upper(),start)
+            while here > -1:
+                hiliter.addHighlight(here, here+len(data), self.painter)
+                start = here + len(data)
+                here = text.upper().find(data.upper(),start)
+    
+    def searchConfig(self, event):
+        data = event.getSource().getText()
+        hiliter = self.editTextArea.getHighlighter()
+        hiliter.removeAllHighlights()
+        if data:
+            doc = self.editTextArea.getDocument()
+            text = doc.getText(0, doc.getLength())
+            start = 0
+            here = text.upper().find(data.upper(),start)
+            while here > -1:
+                hiliter.addHighlight(here, here+len(data), self.painter)
+                start = here + len(data)
+                here = text.upper().find(data.upper(),start)
+    
     #JComboBox Event
     def selectOptionToEdit(self, event):
         if self.typeCb.getSelectedItem():
@@ -321,7 +355,7 @@ class BurpExtender(IBurpExtender, ITab):
         # self.configPanel.setPreferredSize(Dimension(600, 1040))
         leftPanel = JPanel()
         leftPanel.setBorder(CompoundBorder(TitledBorder("Payload Type Configuration"), EmptyBorder(4, 4, 4, 4)))
-        leftPanel.setPreferredSize(Dimension(500, 1290))
+        leftPanel.setPreferredSize(Dimension(500, 940))
         addTypePanel =  JPanel(GridBagLayout())
         addTypePanel.setPreferredSize(Dimension(480, 150))
         gbc.insets = Insets(0,0,0,0)
@@ -364,40 +398,45 @@ class BurpExtender(IBurpExtender, ITab):
         self.dsplayPanel.setPreferredSize(Dimension(480, 1000))
         
         
-        # panelScroll = JScrollPane(self.dsplayPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED)
-        # panelScroll.setViewportView()
-        # panelScroll.setPreferredSize(Dimension(480, 600))
         leftPanel.add(self.dsplayPanel)
         leftPanel.setVisible(True)
         
         self.loadPayloadType()
-        # leftPanel.add(self.dsplayPanel)
            
         self.rightPanel = JPanel()
         self.rightPanel.setBorder(CompoundBorder(TitledBorder("Edit Payloads"), EmptyBorder(4, 4, 4, 4)))          
-        self.rightPanel.setPreferredSize(Dimension(1200, 1290))
+        self.rightPanel.setPreferredSize(Dimension(1200, 940))
 
         self.selectTypePanel = JPanel(GridBagLayout())
         self.selectTypePanel.setPreferredSize(Dimension(1000, 50))
         self.typeCb = JComboBox(self.payloadTypeList)
         self.typeCb.setPrototypeDisplayValue("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-        gbc.insets = Insets(-20,0,0,30)
+        gbc.insets = Insets(-20,-230,0,20)
         self.typeCb.addActionListener(self.selectOptionToEdit)
-        self.selectTypePanel.add(self.typeCb, gbc)
+        self.selectTypePanel.add(self.typeCb,gbc)
         self.saveTextBtn = JButton("Save")
         self.saveTextBtn.setPreferredSize(Dimension(80, 20))
         self.changeButtonTextFont(self.saveTextBtn,"BOLD")
         self.saveTextBtn.addActionListener(self.saveCusPayload)
-        gbc.insets = Insets(-20,0,0,350)
+        gbc.insets = Insets(-20,0,0,150)
         gbc.gridx = 2
         self.selectTypePanel.add(self.saveTextBtn,gbc)
         self.renameBtn = JButton("Rename")
         self.renameBtn.setPreferredSize(Dimension(80, 20))
         self.changeButtonTextFont(self.renameBtn,"BOLD")
         self.renameBtn.addActionListener(self.renameType)
-        gbc.insets = Insets(-20,0,0,50)
+        gbc.insets = Insets(-20,0,0,20)
         gbc.gridx = 1
         self.selectTypePanel.add(self.renameBtn,gbc)
+        searchConfLb = JLabel("Search")
+        searchConTf = JTextField(15, actionPerformed = self.searchConfig)
+        searchConTf.requestFocusInWindow()
+        gbc.gridx = 3
+        gbc.insets = Insets(-20,0,0,0)
+        self.selectTypePanel.add(searchConfLb, gbc)
+        gbc.gridx = 4
+        gbc.insets = Insets(-20,0,0,-200)
+        self.selectTypePanel.add(searchConTf, gbc)
         self.rightPanel.add(self.selectTypePanel)
         
         editPayloadPanel = JPanel(GridBagLayout())
@@ -434,8 +473,8 @@ class BurpExtender(IBurpExtender, ITab):
         payloadPanel = JPanel(BorderLayout())
         showPanel = JPanel(GridBagLayout())
         showPanel.setPreferredSize(Dimension(1000, 950))
-        # blackBorder = BorderFactory.createLineBorder(Color.black)
-        # showPanel.setBorder(blackBorder)
+        blackBorder = BorderFactory.createLineBorder(Color.black)
+        showPanel.setBorder(blackBorder)
         self.showTextPane = JTextPane()
         self.showTextPane.setEditable(False)
         showJsp = JScrollPane(self.showTextPane) 
@@ -450,7 +489,20 @@ class BurpExtender(IBurpExtender, ITab):
         showPanel.add(showLabel, gbc)
         gbc.gridy = 1
         gbc.insets = Insets(10,0,0,0) 
-        showPanel.add(showJsp, gbc)              
+        showPanel.add(showJsp, gbc)
+        searchBtn = JLabel("Search")
+        self.painter = DefaultHighlighter.DefaultHighlightPainter(Color.YELLOW)
+        # self.showTextPane
+        self.searchTextField = JTextField(15, actionPerformed = self.search)
+        self.searchTextField.requestFocusInWindow()
+
+        gbc.gridx = 1
+        gbc.gridy = 0 
+        gbc.insets = Insets(10,20,0,0)    
+        showPanel.add(searchBtn, gbc)  
+        gbc.gridx = 2
+        gbc.insets = Insets(10,10,0,0) 
+        showPanel.add(self.searchTextField, gbc)                    
         payloadPanel.add(showPanel, BorderLayout.NORTH)
         
         containerPanel.add(self.configPanel)
@@ -460,8 +512,10 @@ class BurpExtender(IBurpExtender, ITab):
         
         return containerPanel
 
+    
     def registerExtenderCallbacks(self,callbacks):
         callbacks.setExtensionName("My Payloads")
         callbacks.printOutput("abcd")        
         callbacks.addSuiteTab(self)
+
 
