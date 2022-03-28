@@ -189,12 +189,13 @@ class BurpExtender(IBurpExtender, ITab):
         gbc = GridBagConstraints()
         gbc.gridx = 0
         gbc.gridy = 0
-        gbc.anchor = GridBagConstraints.WEST
+        gbc.anchor = GridBagConstraints.NORTHWEST
         count = 100
         typeId=0
         if self.payloadTypeList:
             for x in self.payloadTypeList:
-                gbc.insets = Insets(-1050 + count,0,0,250)
+                # gbc.insets = Insets(-1050 + count,0,0,250)
+                gbc.insets = Insets(0,0,0,250)
                 self.radioBtnList.append(JRadioButton(x))
                 self.dsplayPanel.add(self.radioBtnList[typeId], gbc)
                 gbc.gridy += 1
@@ -352,7 +353,6 @@ class BurpExtender(IBurpExtender, ITab):
         ##################################
         self.configPanel = JPanel(GridBagLayout())
         self.configPanel.setName("Configuration")
-        # self.configPanel.setPreferredSize(Dimension(600, 1040))
         leftPanel = JPanel()
         leftPanel.setBorder(CompoundBorder(TitledBorder("Payload Type Configuration"), EmptyBorder(4, 4, 4, 4)))
         leftPanel.setPreferredSize(Dimension(500, 940))
@@ -393,11 +393,9 @@ class BurpExtender(IBurpExtender, ITab):
         deleteBtn.addActionListener(self.deleteType)
         gbc.insets = Insets(-30,0,0,140)
         buttonPanel.add(deleteBtn, gbc)
-        
         self.dsplayPanel = JPanel(GridBagLayout())
-        self.dsplayPanel.setPreferredSize(Dimension(480, 1000))
-        
-        
+        self.dsplayPanel.setPreferredSize(Dimension(480, 640))
+
         leftPanel.add(self.dsplayPanel)
         leftPanel.setVisible(True)
         
@@ -460,8 +458,6 @@ class BurpExtender(IBurpExtender, ITab):
         editPayloadPanel.add(jsp,gbc)
         self.rightPanel.add(editPayloadPanel)
         
-        # self.dsplayPanel.setPreferredSize(Dimension(480, 1000))
-
         gbc.gridx = 0
         gbc.gridy = 0
         gbc.insets = Insets(-350,0,0,0)
@@ -492,7 +488,6 @@ class BurpExtender(IBurpExtender, ITab):
         showPanel.add(showJsp, gbc)
         searchBtn = JLabel("Search")
         self.painter = DefaultHighlighter.DefaultHighlightPainter(Color.YELLOW)
-        # self.showTextPane
         self.searchTextField = JTextField(15, actionPerformed = self.search)
         self.searchTextField.requestFocusInWindow()
 
